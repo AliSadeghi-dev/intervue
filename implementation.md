@@ -222,21 +222,22 @@ Responsibilities include:
 
 Use PostgreSQL for persistent application data.
 
-For local development, use a local PostgreSQL instance or Docker.
+Use [Supabase](https://supabase.com) managed PostgreSQL for development and deployment (free tier).
 
-For deployment, use a free managed PostgreSQL tier (for example Neon or Supabase) compatible with Prisma and Vercel.
+Store `DATABASE_URL` (pooled connection for the app) and `DIRECT_URL` (direct/session connection for Prisma migrations) in environment variables. Compatible with Prisma and Vercel.
 
 ### Authentication
 
 Use Auth.js for authentication.
 
-For MVP, implement **email and password** using Auth.js credentials provider:
+Implement Auth.js with:
 
-- Register with name, email, and password.
-- Login with email and password.
-- Store a secure password hash on the User model.
+- **Google OAuth** for sign-up and sign-in.
+- **Email and password** (credentials provider) for register and login.
+- `passwordHash` on `User` is optional (null for Google-only accounts).
+- On Google sign-in, upsert the user by email in PostgreSQL so sessions use the same `User.id` as credentials auth.
 
-OAuth providers are out of scope for MVP unless explicitly added later.
+Google redirect URI (local): `http://localhost:3000/api/auth/callback/google`
 
 Protect private routes and ensure users can only access their own interview sessions and reports.
 
@@ -660,13 +661,26 @@ Suggested variables:
 ```env
 DATABASE_URL=
 
+DIRECT_URL=
+
 AUTH_SECRET=
+
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 
 GROQ_API_KEY=
 GROQ_MODEL=openai/gpt-oss-120b
 
 ASSEMBLYAI_API_KEY=
 ```
+
+Generate `AUTH_SECRET` (Auth.js signing key; do not use your database password):
+
+```bash
+openssl rand -base64 32
+```
+
+With Supabase, `DATABASE_URL` is the transaction pooler URI; `DIRECT_URL` is the session or direct URI for Prisma migrations.
 
 Add any additional variables required by the selected Auth.js configuration.
 
@@ -683,7 +697,7 @@ Required provider configuration:
 | LLM      | Groq                    | Use available free quota where eligible            |
 | STT      | AssemblyAI              | Use available free tier                            |
 | TTS      | Browser SpeechSynthesis | Built into supported browsers                      |
-| Database | PostgreSQL              | Local or Docker for dev; Neon or Supabase free tier for deployment |
+| Database | Supabase (PostgreSQL)   | Free tier; pooled `DATABASE_URL` + `DIRECT_URL` for Prisma migrations |
 | Hosting  | Vercel                  | Free tier for development/demo where eligible      |
 
 Important:

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { Suspense } from "react";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SiteHeaderFallback } from "@/components/layout/site-header-fallback";
 
 import "./globals.css";
 
@@ -38,10 +40,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col font-sans text-base leading-relaxed">
-        <SiteHeader />
+      <body
+        suppressHydrationWarning
+        className="flex min-h-full flex-col font-sans text-base leading-relaxed"
+      >
+        <Suspense fallback={<SiteHeaderFallback />}>
+          <SiteHeader />
+        </Suspense>
         <div className="flex flex-1 flex-col">{children}</div>
         <SiteFooter />
       </body>

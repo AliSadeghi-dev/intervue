@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   ArrowRight,
   BarChart3,
@@ -8,7 +7,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import {
   Card,
   CardContent,
@@ -147,12 +146,12 @@ export default function HomePage() {
             improve before your next onsite.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button size="lg" render={<Link href="/register" />}>
+            <ButtonLink href="/register" size="lg">
               Get started
-            </Button>
-            <Button variant="outline" size="lg" render={<Link href="/login" />}>
+            </ButtonLink>
+            <ButtonLink href="/login" variant="outline" size="lg">
               Log in
-            </Button>
+            </ButtonLink>
           </div>
         </div>
       </section>
@@ -242,9 +241,9 @@ export default function HomePage() {
           Create a free account to save sessions, track scores over time, and
           open detailed reports after every interview.
         </p>
-        <Button size="lg" render={<Link href="/register" />}>
+        <ButtonLink href="/register" size="lg">
           Start practicing
-        </Button>
+        </ButtonLink>
       </section>
     </main>
   );
