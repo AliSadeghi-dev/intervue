@@ -41,8 +41,11 @@ git checkout -b ep01-foundation
 
 If starting from an empty app folder with only `implementation.md`, initialize the app:
 
+If the repository folder name contains capital letters, npm rejects a root install. Scaffold in a lowercase subfolder, then move files to the repo root:
+
 ```bash
-pnpm create next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --turbopack --yes
+pnpm create next-app@latest interviewai --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --turbopack --yes --use-pnpm
+# Move generated files into the repository root (keep implementation.md and docs/)
 ```
 
 Initialize shadcn/ui (Episodes use the default New York style):
