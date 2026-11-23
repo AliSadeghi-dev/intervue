@@ -6,6 +6,7 @@ import {
   Settings2,
   Sparkles,
 } from "lucide-react";
+import Image from "next/image";
 
 import { ButtonLink } from "@/components/ui/button-link";
 import {
@@ -133,25 +134,44 @@ export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="border-b border-border/60 bg-linear-to-b from-muted/40 to-background">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 py-20 text-center sm:px-6 sm:py-28">
-          <p className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
-            AI-powered interview practice
-          </p>
-          <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl sm:leading-[1.1]">
-            Sharpen your technical interviews before the real hiring loop
-          </h1>
-          <p className="max-w-2xl text-lg text-muted-foreground">
-            InterviewAI simulates a technical interview with adaptive questions,
-            structured scoring, and a detailed final report—so you know what to
-            improve before your next onsite.
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/register" size="lg">
-              Get started
-            </ButtonLink>
-            <ButtonLink href="/login" variant="outline" size="lg">
-              Log in
-            </ButtonLink>
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-10 px-4 py-16 text-center sm:px-6 sm:py-20 lg:gap-12 lg:py-24">
+          <div className="flex max-w-3xl flex-col items-center gap-8">
+            <p className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+              AI-powered interview practice
+            </p>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl sm:leading-[1.1]">
+              Sharpen your technical interviews before the real hiring loop
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              InterviewAI simulates a technical interview with adaptive questions,
+              structured scoring, and a detailed final report—so you know what to
+              improve before your next onsite.
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <ButtonLink href="/register" size="lg">
+                Get started
+              </ButtonLink>
+              <ButtonLink href="/login" variant="outline" size="lg">
+                Log in
+              </ButtonLink>
+            </div>
+          </div>
+
+          <div className="w-full min-w-0">
+            <div className="overflow-hidden rounded-2xl border border-border/70 bg-background p-2 shadow-xl ring-1 ring-foreground/8 sm:rounded-3xl sm:p-2.5">
+              <Image
+                src="/screenshot-2.png"
+                alt="Interview report with overall scores and a performance summary"
+                width={1231}
+                height={774}
+                className="h-auto w-full rounded-xl sm:rounded-2xl"
+                priority
+                sizes="100vw"
+              />
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Reports with per-skill scores and actionable feedback
+            </p>
           </div>
         </div>
       </section>
