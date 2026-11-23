@@ -1,3 +1,4 @@
+import { DEFAULT_INTERVIEW_MODE } from "@/lib/interview/constants";
 import type { CreateInterviewSessionInput } from "@/lib/validations/interview";
 import { prisma } from "@/lib/prisma";
 
@@ -11,7 +12,7 @@ export async function createInterviewSession(
       jobRole: input.jobRole,
       experienceLevel: input.experienceLevel,
       duration: input.duration,
-      interviewMode: input.interviewMode,
+      interviewMode: DEFAULT_INTERVIEW_MODE,
       status: "pending",
     },
   });

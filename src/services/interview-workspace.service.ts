@@ -3,6 +3,7 @@ import type { InterviewQuestion } from "@prisma/client";
 import { answerEvaluationSchema, toMiniFeedback } from "@/lib/ai/schemas";
 import type { RecentQaPair } from "@/lib/ai/prompts";
 import { isGroqConfigured } from "@/lib/ai/groq";
+import { isAssemblyAIConfigured } from "@/lib/speech/assemblyai";
 import {
   getRemainingSeconds,
   isInterviewTimeExpired,
@@ -110,6 +111,7 @@ function formatWorkspace(
     questionCount,
     answeredCount,
     groqConfigured: isGroqConfigured(),
+    assemblyAIConfigured: isAssemblyAIConfigured(),
   };
 }
 

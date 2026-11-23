@@ -31,8 +31,8 @@ export default async function NewInterviewPage() {
         <CardHeader className="items-center text-center">
           <CardTitle>Configure your interview</CardTitle>
           <CardDescription className="text-balance">
-            Choose your role, level, duration, and mode. Questions and scoring
-            are added in the next episode.
+            Pick role, experience, and how long you have. In the workspace you answer each
+            question by typing or recording — no separate mode to choose.
           </CardDescription>
         </CardHeader>
         <CardContent>

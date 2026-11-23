@@ -18,6 +18,7 @@ const experienceLabels: Record<ExperienceLevel, string> = {
 };
 
 const modeLabels: Record<InterviewMode, string> = {
+  hybrid: "Text & voice",
   text: "Text",
   voice: "Voice",
 };

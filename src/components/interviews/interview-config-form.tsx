@@ -19,17 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  EXPERIENCE_LEVELS,
-  INTERVIEW_DURATIONS,
-  INTERVIEW_MODES,
-  JOB_ROLES,
-} from "@/lib/interview/constants";
-import {
-  formatExperienceLevel,
-  formatInterviewMode,
-  formatJobRole,
-} from "@/lib/interview/labels";
+import { EXPERIENCE_LEVELS, INTERVIEW_DURATIONS, JOB_ROLES } from "@/lib/interview/constants";
+import { formatExperienceLevel, formatJobRole } from "@/lib/interview/labels";
 import {
   createInterviewSessionSchema,
   type CreateInterviewSessionInput,
@@ -45,7 +36,6 @@ export function InterviewConfigForm() {
       jobRole: "frontend",
       experienceLevel: "junior",
       duration: 15,
-      interviewMode: "text",
     },
   });
 
@@ -157,30 +147,10 @@ export function InterviewConfigForm() {
         </FieldContent>
       </Field>
 
-      <Field>
-        <FieldLabel>Interview mode</FieldLabel>
-        <FieldContent>
-          <Controller
-            name="interviewMode"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select mode" />
-                </SelectTrigger>
-                <SelectContent>
-                  {INTERVIEW_MODES.map((mode) => (
-                    <SelectItem key={mode} value={mode}>
-                      {formatInterviewMode(mode)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <FieldError errors={[formState.errors.interviewMode]} />
-        </FieldContent>
-      </Field>
+      <p className="rounded-lg border border-border/70 bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+        In the workspace you can <span className="font-medium text-foreground">type</span> or{" "}
+        <span className="font-medium text-foreground">record</span> each answer — no mode to pick here.
+      </p>
 
       {formError ? (
         <p className="text-sm text-destructive" role="alert">

@@ -2,22 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
+import { InterviewAnswerComposer } from "@/components/interview/interview-answer-composer";
 import { MiniFeedbackCard, type MiniFeedback } from "@/components/interview/mini-feedback-card";
 import { ButtonLink } from "@/components/ui/button-link";
 import { InterviewTimer } from "@/components/interview/interview-timer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
-import { MAX_ANSWER_LENGTH } from "@/lib/validations/answer";
+import { InterviewQuestionPanel } from "@/components/interview/interview-question-panel";
 
 type WorkspaceQuestion = {
   id: string;
@@ -37,6 +31,16 @@ type InterviewWorkspaceProps = {
   sessionId: string;
 };
 
+function questionTypeLabel(type: string): string {
+  if (type === "opening") {
+    return "Opening";
+  }
+  if (type === "closing") {
+    return "Closing";
+  }
+  return "Follow-up";
+}
+
 export function InterviewWorkspace({ sessionId }: InterviewWorkspaceProps) {
   const router = useRouter();
   const [interview, setInterview] = useState<WorkspaceInterview | null>(null);
@@ -54,6 +58,7 @@ export function InterviewWorkspace({ sessionId }: InterviewWorkspaceProps) {
   const [evaluationError, setEvaluationError] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [groqConfigured, setGroqConfigured] = useState(true);
+  const [assemblyAIConfigured, setAssemblyAIConfigured] = useState(true);
   const [workspaceReady, setWorkspaceReady] = useState(false);
 
   const syncWorkspace = useCallback(async () => {
@@ -70,6 +75,7 @@ export function InterviewWorkspace({ sessionId }: InterviewWorkspaceProps) {
       questionCount: number;
       answeredCount: number;
       groqConfigured: boolean;
+      assemblyAIConfigured: boolean;
     };
 
     setInterview(data.interview);
@@ -78,6 +84,7 @@ export function InterviewWorkspace({ sessionId }: InterviewWorkspaceProps) {
     setQuestionCount(data.questionCount);
     setAnsweredCount(data.answeredCount);
     setGroqConfigured(data.groqConfigured);
+    setAssemblyAIConfigured(data.assemblyAIConfigured);
     setCompleted(data.interview.status === "completed");
     setLoadError(null);
     setWorkspaceReady(true);
@@ -136,7 +143,7 @@ export function InterviewWorkspace({ sessionId }: InterviewWorkspaceProps) {
     if (question || isLoadingQuestion) {
       return;
     }
-  void loadNextQuestion();
+    void loadNextQuestion();
   }, [interview, completed, question, isLoadingQuestion, loadNextQuestion]);
 
   async function handleSubmit() {
@@ -237,10 +244,8 @@ export function InterviewWorkspace({ sessionId }: InterviewWorkspaceProps) {
     router.refresh();
   }
 
-  const progressPercent =
-    interview && interview.duration > 0
-      ? Math.min(100, (answeredCount / Math.max(answeredCount + 1, questionCount || 1)) * 100)
-      : 0;
+  const totalSteps = Math.max(questionCount, answeredCount + (question ? 1 : 0), 1);
+  const progressPercent = Math.min(100, (answeredCount / totalSteps) * 100);
 
   if (loadError) {
     return (
@@ -253,29 +258,26 @@ export function InterviewWorkspace({ sessionId }: InterviewWorkspaceProps) {
 
   if (!workspaceReady) {
     return (
-      <Card className="border-border/80 shadow-none">
-        <CardHeader>
-          <CardTitle>Preparing workspace</CardTitle>
-          <CardDescription>Loading your session and timer…</CardDescription>
-        </CardHeader>
-      </Card>
+      <div className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border/70 bg-muted/20">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        <p className="text-sm text-muted-foreground">Preparing your interview room…</p>
+      </div>
     );
   }
 
   if (completed) {
     return (
-      <Card className="border-border/80 shadow-none">
-        <CardHeader>
-          <CardTitle>Interview complete</CardTitle>
-          <CardDescription>
-            You answered {answeredCount} question{answeredCount === 1 ? "" : "s"}. Your final report
-            includes scores, recommendations, and a per-question review.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ButtonLink href={`/reports/${sessionId}`}>View full report</ButtonLink>
-        </CardContent>
-      </Card>
+      <section className="overflow-hidden rounded-3xl border border-border/50 bg-card p-8 text-center shadow-lg shadow-black/[0.04]">
+        <p className="text-sm font-medium text-primary">Session complete</p>
+        <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">Nice work</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          You answered {answeredCount} question{answeredCount === 1 ? "" : "s"}. Open your report for
+          scores, strengths, and what to practice next.
+        </p>
+        <ButtonLink href={`/reports/${sessionId}`} size="lg" className="mt-6 rounded-full px-8">
+          View full report
+        </ButtonLink>
+      </section>
     );
   }
 
@@ -285,110 +287,91 @@ export function InterviewWorkspace({ sessionId }: InterviewWorkspaceProps) {
         <Alert variant="destructive">
           <AlertTitle>AI not configured</AlertTitle>
           <AlertDescription>
-            Add <code className="text-xs">GROQ_API_KEY</code> to your server environment to generate
-            questions and evaluate answers.
+            Add <code className="text-xs">GROQ_API_KEY</code> to generate questions and evaluate answers.
           </AlertDescription>
         </Alert>
       ) : null}
 
-      {interview?.interviewMode === "voice" ? (
-        <Alert>
-          <AlertTitle>Text mode for this milestone</AlertTitle>
-          <AlertDescription>
-            Voice recording and text-to-speech ship in Episode 6. Type your answers below for now.
-          </AlertDescription>
-        </Alert>
-      ) : null}
-
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm text-muted-foreground">Time remaining</p>
-          {workspaceReady ? (
-            <InterviewTimer
-              initialSeconds={remainingSeconds}
-              onExpired={() => void handleTimeExpired()}
-            />
-          ) : null}
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/40 bg-linear-to-r from-card via-card to-muted/30 px-5 py-4 shadow-sm">
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span className="rounded-full bg-muted px-2.5 py-0.5 font-medium text-foreground">
+              {answeredCount} answered
+            </span>
+            {questionCount > 0 ? (
+              <span className="rounded-full bg-muted/60 px-2.5 py-0.5">{questionCount} in plan</span>
+            ) : null}
+            {question ? (
+              <span className="rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 text-primary">
+                Q{question.questionOrder} · {questionTypeLabel(question.questionType)}
+              </span>
+            ) : null}
+          </div>
+          <Progress value={progressPercent} className="h-1 max-w-xs" />
         </div>
-        <div className="text-sm text-muted-foreground">
-          Question {question?.questionOrder ?? answeredCount + 1}
-          {questionCount > 0 ? ` · ${answeredCount} answered` : null}
-        </div>
-      </div>
-
-      <Progress value={progressPercent} className="h-1.5" />
+        {workspaceReady ? (
+          <InterviewTimer
+            initialSeconds={remainingSeconds}
+            onExpired={() => void handleTimeExpired()}
+          />
+        ) : null}
+      </header>
 
       {miniFeedback ? <MiniFeedbackCard feedback={miniFeedback} /> : null}
 
       {evaluationError ? (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 rounded-2xl border border-border/50 bg-muted/25 px-4 py-3">
           <p className="text-sm text-muted-foreground">
             Your answer was saved, but evaluation failed. You can retry without retyping.
           </p>
-          <Button type="button" variant="outline" size="sm" onClick={() => void handleRetryEvaluation()}>
+          <Button type="button" variant="outline" size="sm" className="w-fit rounded-full" onClick={() => void handleRetryEvaluation()}>
             Retry evaluation
           </Button>
         </div>
       ) : null}
 
-      <Card className="border-border/80 shadow-none">
-        <CardHeader>
-          <CardTitle>Current question</CardTitle>
-          <CardDescription>
-            {isLoadingQuestion
-              ? "Generating your next question…"
-              : question
-                ? `Type ${question.questionType === "opening" ? "an opening" : "a follow-up"} answer below.`
-                : "Loading question…"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {question ? (
-            <p className="whitespace-pre-wrap text-base leading-relaxed">{question.content}</p>
+      <section className="overflow-hidden rounded-3xl border border-border/50 bg-card shadow-lg shadow-black/[0.03] ring-1 ring-black/[0.03] dark:ring-white/[0.06]">
+        <div className="border-b border-border/40 bg-linear-to-br from-muted/40 via-transparent to-transparent px-6 py-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Interviewer
+          </p>
+          {isLoadingQuestion ? (
+            <div className="mt-4 flex items-center gap-3 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" />
+              Crafting your next question…
+            </div>
+          ) : question ? (
+            <InterviewQuestionPanel questionText={question.content} autoRead />
           ) : (
-            <p className="text-sm text-muted-foreground">
-              {isLoadingQuestion ? "Please wait while the AI prepares a question." : "No question yet."}
-            </p>
+            <p className="mt-3 text-sm text-muted-foreground">Waiting for the next question…</p>
           )}
+        </div>
+      </section>
 
-          {question ? (
-            <>
-              <Textarea
-                value={answer}
-                onChange={(event) => setAnswer(event.target.value)}
-                placeholder="Write your answer in English…"
-                rows={8}
-                maxLength={MAX_ANSWER_LENGTH}
-                disabled={isSubmitting}
-                aria-label="Your answer"
-              />
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs text-muted-foreground">
-                  {answer.length.toLocaleString()} / {MAX_ANSWER_LENGTH.toLocaleString()}
-                </span>
-                <Button
-                  type="button"
-                  onClick={() => void handleSubmit()}
-                  disabled={isSubmitting || answer.trim().length === 0}
-                >
-                  {isSubmitting ? "Submitting…" : "Submit answer"}
-                </Button>
-              </div>
-            </>
-          ) : null}
-        </CardContent>
-      </Card>
+      {question ? (
+        <InterviewAnswerComposer
+          sessionId={sessionId}
+          questionId={question.id}
+          answer={answer}
+          onAnswerChange={setAnswer}
+          onSubmit={() => void handleSubmit()}
+          isSubmitting={isSubmitting}
+          speechEnabled={assemblyAIConfigured}
+        />
+      ) : null}
 
       {error ? (
-        <p className="text-sm text-destructive" role="alert">
+        <p className="text-center text-sm text-destructive" role="alert">
           {error}
         </p>
       ) : null}
 
       {error && !question ? (
-        <Button type="button" variant="outline" onClick={() => void loadNextQuestion()}>
-          Try again
-        </Button>
+        <div className="flex justify-center">
+          <Button type="button" variant="outline" className="rounded-full" onClick={() => void loadNextQuestion()}>
+            Try again
+          </Button>
+        </div>
       ) : null}
     </div>
   );

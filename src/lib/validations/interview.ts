@@ -1,11 +1,6 @@
 import { z } from "zod";
 
-import {
-  EXPERIENCE_LEVELS,
-  INTERVIEW_DURATIONS,
-  INTERVIEW_MODES,
-  JOB_ROLES,
-} from "@/lib/interview/constants";
+import { EXPERIENCE_LEVELS, INTERVIEW_DURATIONS, JOB_ROLES } from "@/lib/interview/constants";
 
 export const createInterviewSessionSchema = z.object({
   jobRole: z.enum(JOB_ROLES),
@@ -17,7 +12,6 @@ export const createInterviewSessionSchema = z.object({
       ...z.ZodLiteral<(typeof INTERVIEW_DURATIONS)[number]>[],
     ],
   ),
-  interviewMode: z.enum(INTERVIEW_MODES),
 });
 
 export type CreateInterviewSessionInput = z.infer<
