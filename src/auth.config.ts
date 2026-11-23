@@ -15,7 +15,8 @@ export const authConfig = {
       const isProtected =
         path.startsWith("/dashboard") ||
         path.startsWith("/interviews") ||
-        path.startsWith("/interview/");
+        path.startsWith("/interview/") ||
+        path.startsWith("/reports/");
 
       if (isProtected) {
         return !!auth?.user;

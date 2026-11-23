@@ -3,6 +3,7 @@ import type { z } from "zod";
 export function parseJsonResponse<T extends z.ZodType>(
   raw: string,
   schema: T,
+  normalize?: (value: unknown) => unknown,
 ): z.infer<T> {
   let parsed: unknown;
   try {
@@ -11,5 +12,6 @@ export function parseJsonResponse<T extends z.ZodType>(
     throw new Error("AI response was not valid JSON");
   }
 
-  return schema.parse(parsed);
+  const normalized = normalize ? normalize(parsed) : parsed;
+  return schema.parse(normalized);
 }

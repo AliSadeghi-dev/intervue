@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ButtonLink } from "@/components/ui/button-link";
 import { DeleteInterviewButton } from "@/components/interviews/delete-interview-button";
 import { InterviewStatusBadge } from "@/components/interviews/interview-status-badge";
 import {
@@ -16,6 +17,7 @@ export type InterviewListItem = {
   interviewMode: string;
   status: string;
   createdAt: Date;
+  report?: { overallScore: number } | null;
 };
 
 type InterviewHistoryListProps = {
@@ -63,9 +65,21 @@ export function InterviewHistoryList({
             </p>
             <p className="text-xs text-muted-foreground">
               Created {formatDate(session.createdAt)}
+              {session.report ? ` · Overall score ${session.report.overallScore}` : null}
             </p>
           </div>
-          <DeleteInterviewButton sessionId={session.id} />
+          <div className="flex flex-wrap items-center gap-2">
+            {session.status === "completed" ? (
+              <ButtonLink href={`/reports/${session.id}`} size="sm" variant="outline">
+                View report
+              </ButtonLink>
+            ) : (
+              <ButtonLink href={`/interview/${session.id}`} size="sm" variant="outline">
+                Open workspace
+              </ButtonLink>
+            )}
+            <DeleteInterviewButton sessionId={session.id} />
+          </div>
         </li>
       ))}
     </ul>

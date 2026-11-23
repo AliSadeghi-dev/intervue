@@ -21,6 +21,9 @@ export async function listInterviewSessions(userId: string) {
   return prisma.interviewSession.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
+    include: {
+      report: { select: { overallScore: true } },
+    },
   });
 }
 
@@ -66,14 +69,23 @@ export async function getDashboardSummary(userId: string) {
     where: { userId },
     orderBy: { createdAt: "desc" },
     take: 5,
+    include: {
+      report: { select: { overallScore: true } },
+    },
   });
 
   const totalCount = await prisma.interviewSession.count({
     where: { userId },
   });
 
+  const average = await prisma.interviewReport.aggregate({
+    where: { session: { userId } },
+    _avg: { overallScore: true },
+  });
+
   return {
     totalCount,
     recentSessions: sessions,
+    averageOverallScore: average._avg.overallScore,
   };
 }

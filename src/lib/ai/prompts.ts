@@ -45,7 +45,14 @@ Return a single JSON object with this exact shape:
 }
 Weight technical accuracy (30%), depth (25%), problem-solving (25%), completeness (20%).
 Weight communication: clarity (35%), structure (30%), conciseness (20%), terminology (15%).
-Scores are estimates, not judgments of the person. Be constructive and specific.`;
+
+Scoring rules (strict):
+- Answers with no real technical content, jokes, begging for a high score, or pure filler: technicalScore 0–15, communicationScore 0–30, overallScore 0–20.
+- Politeness or enthusiasm alone is NOT communication skill. Do not award high communication scores for non-answers.
+- One-word or single-sentence non-answers: stay in the 0–25 overall range unless they contain accurate technical substance.
+- Strong scores (70+) require accurate, structured technical content that addresses the question.
+
+Scores are estimates, not judgments of the person. Be honest and specific.`;
 }
 
 export function buildQuestionUserPrompt(
@@ -93,3 +100,52 @@ ${answerContent}`;
 }
 
 export type QaForContext = InterviewAnswer & { question: InterviewQuestion };
+
+export function buildFinalReportSystemPrompt(): string {
+  return `You are an expert technical interview coach producing a final interview report in English.
+Return a single JSON object matching the required shape (scores 0-100, arrays of strings, nested technicalAssessment and communicationAssessment objects, and questionReviews for each Q&A pair).
+Base every judgment on the provided answers. Avoid generic filler.
+questionReviews must align with the supplied questions and answers (use the same order and text).
+For unanswered interviews, use low scores and explain that no answers were submitted.
+communicationAssessment fields must be English prose strings (not numeric scores). doneWell and couldImprove must be arrays of strings. Required keys: overallScore, technicalScore, communicationScore, summary, strengths, weaknesses, recommendations, technicalAssessment { strongestAreas, weakestAreas, conceptsUnderstoodWell, conceptsToStudy }, communicationAssessment { clarity, structure, conciseness, technicalVocabulary }, questionReviews[] { questionOrder, question, answer, technicalScore, communicationScore, overallScore, doneWell, couldImprove, strongerAnswerExample }.
+Do not wrap JSON in markdown.`;
+}
+
+export type FinalReportQaInput = {
+  questionOrder: number;
+  questionType: string;
+  question: string;
+  answer: string;
+  technicalScore: number | null;
+  communicationScore: number | null;
+  overallScore: number | null;
+  evaluationJson: string;
+};
+
+export function buildFinalReportUserPrompt(
+  session: InterviewSession,
+  qa: FinalReportQaInput[],
+): string {
+  const qaBlock =
+    qa.length === 0
+      ? "No answers were recorded."
+      : qa
+          .map(
+            (item) =>
+              `### Q${item.questionOrder} (${item.questionType})
+Question: ${item.question}
+Answer: ${item.answer}
+Scores: technical ${item.technicalScore ?? "n/a"}, communication ${item.communicationScore ?? "n/a"}, overall ${item.overallScore ?? "n/a"}
+Prior evaluation JSON: ${item.evaluationJson}`,
+          )
+          .join("\n\n");
+
+  return `Role: ${formatJobRole(session.jobRole)}
+Experience: ${formatExperienceLevel(session.experienceLevel)}
+Mode: ${formatInterviewMode(session.interviewMode)}
+Configured duration (minutes): ${session.duration}
+Session summary: ${session.contextSummary ?? "None."}
+
+Question and answer transcript:
+${qaBlock}`;
+}

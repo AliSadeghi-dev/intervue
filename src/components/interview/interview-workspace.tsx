@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { MiniFeedbackCard, type MiniFeedback } from "@/components/interview/mini-feedback-card";
+import { ButtonLink } from "@/components/ui/button-link";
 import { InterviewTimer } from "@/components/interview/interview-timer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -267,10 +268,13 @@ export function InterviewWorkspace({ sessionId }: InterviewWorkspaceProps) {
         <CardHeader>
           <CardTitle>Interview complete</CardTitle>
           <CardDescription>
-            You answered {answeredCount} question{answeredCount === 1 ? "" : "s"}. The full report
-            arrives in Episode 5.
+            You answered {answeredCount} question{answeredCount === 1 ? "" : "s"}. Your final report
+            includes scores, recommendations, and a per-question review.
           </CardDescription>
         </CardHeader>
+        <CardContent>
+          <ButtonLink href={`/reports/${sessionId}`}>View full report</ButtonLink>
+        </CardContent>
       </Card>
     );
   }

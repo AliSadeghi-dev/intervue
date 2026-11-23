@@ -11,6 +11,7 @@ import { prisma } from "@/lib/prisma";
 import type { SubmitAnswerInput } from "@/lib/validations/answer";
 import { evaluateAnswer } from "@/services/evaluation.service";
 import { generateQuestionContent } from "@/services/question.service";
+import { ensureInterviewReport } from "@/services/report.service";
 
 async function loadOwnedSession(sessionId: string, userId: string) {
   return prisma.interviewSession.findFirst({
@@ -131,6 +132,10 @@ export async function completeInterviewSession(sessionId: string, userId: string
       status: "completed",
       completedAt: new Date(),
     },
+  });
+
+  void ensureInterviewReport(sessionId, userId).catch((error) => {
+    console.error("Report generation after complete failed", error);
   });
 
   return { session: updated };

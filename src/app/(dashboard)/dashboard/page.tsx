@@ -27,9 +27,8 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const { totalCount, recentSessions } = await getDashboardSummary(
-    session.user.id,
-  );
+  const { totalCount, recentSessions, averageOverallScore } =
+    await getDashboardSummary(session.user.id);
 
   return (
     <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
@@ -60,11 +59,11 @@ export default async function DashboardPage() {
         <Card className="border-border/80 shadow-none">
           <CardHeader>
             <CardTitle>Average score</CardTitle>
-            <CardDescription>Available after AI scoring in Episode 4+</CardDescription>
+            <CardDescription>Across interviews with a generated report</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="font-heading text-3xl font-bold text-muted-foreground">
-              —
+            <p className="font-heading text-3xl font-bold">
+              {averageOverallScore != null ? Math.round(averageOverallScore) : "—"}
             </p>
           </CardContent>
         </Card>

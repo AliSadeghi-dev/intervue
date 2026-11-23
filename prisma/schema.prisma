@@ -74,15 +74,18 @@ model InterviewAnswer {
 }
 
 model InterviewReport {
-  id                 String   @id @default(cuid())
-  sessionId          String   @unique
-  session            InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  overallScore       Int
-  technicalScore     Int
-  communicationScore Int
-  summary            String   @db.Text
-  strengths          Json
-  weaknesses         Json
-  recommendations    Json
-  createdAt          DateTime @default(now())
+  id                      String   @id @default(cuid())
+  sessionId               String   @unique
+  session                 InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  overallScore            Int
+  technicalScore          Int
+  communicationScore      Int
+  summary                 String   @db.Text
+  strengths               Json
+  weaknesses              Json
+  recommendations         Json
+  technicalAssessment     Json
+  communicationAssessment Json
+  questionReviews         Json
+  createdAt               DateTime @default(now())
 }

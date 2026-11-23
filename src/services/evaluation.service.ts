@@ -6,6 +6,7 @@ import {
   buildEvaluationSystemPrompt,
   buildEvaluationUserPrompt,
 } from "@/lib/ai/prompts";
+import { applyEvaluationSanityChecks } from "@/lib/ai/evaluation-sanity";
 import { answerEvaluationSchema, type AnswerEvaluation } from "@/lib/ai/schemas";
 import { getRemainingMinutes } from "@/lib/interview/timing";
 
@@ -23,5 +24,6 @@ export async function evaluateAnswer(
   );
 
   const raw = await groqChatJson(system, user);
-  return parseJsonResponse(raw, answerEvaluationSchema);
+  const evaluation = parseJsonResponse(raw, answerEvaluationSchema);
+  return applyEvaluationSanityChecks(answerContent, evaluation);
 }
