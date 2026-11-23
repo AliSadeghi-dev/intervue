@@ -1,6 +1,6 @@
 export const JOB_ROLES = ["frontend", "backend", "full_stack"] as const;
 export const EXPERIENCE_LEVELS = ["junior", "mid", "senior"] as const;
-export const INTERVIEW_DURATIONS = [10, 15, 20] as const;
+export const INTERVIEW_DURATIONS = [2, 5, 10, 15, 20] as const;
 export const INTERVIEW_MODES = ["text", "voice"] as const;
 
 export const SESSION_STATUSES = [

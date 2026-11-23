@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { notFound, redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { InterviewWorkspace } from "@/components/interview/interview-workspace";
 import { InterviewStatusBadge } from "@/components/interviews/interview-status-badge";
 import { StartInterviewButton } from "@/components/interviews/start-interview-button";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -46,6 +47,9 @@ export default async function InterviewWorkspacePage({
     notFound();
   }
 
+  const showWorkspace =
+    interview.status === "in_progress" || interview.status === "completed";
+
   return (
     <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -62,32 +66,22 @@ export default async function InterviewWorkspacePage({
         <CardHeader>
           <CardTitle>Session settings</CardTitle>
           <CardDescription>
-            {formatExperienceLevel(interview.experienceLevel)} ·{" "}
-            {interview.duration} minutes · {formatInterviewMode(interview.interviewMode)}
+            {formatExperienceLevel(interview.experienceLevel)} · {interview.duration} minutes ·{" "}
+            {formatInterviewMode(interview.interviewMode)}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 text-sm text-muted-foreground">
-          {interview.status === "pending" ? (
+        {interview.status === "pending" ? (
+          <CardContent className="space-y-4 text-sm text-muted-foreground">
             <p>
-              Your session is ready. Start the interview when you are prepared.
-              AI-generated questions will appear here in Episode 4.
+              Your session is ready. Start the interview when you are prepared. The first
+              technical question is generated when the session begins.
             </p>
-          ) : null}
-          {interview.status === "in_progress" ? (
-            <p>
-              This session is in progress. Question prompts, answer input, and
-              live feedback will be wired up in the next development milestone.
-            </p>
-          ) : null}
-          {interview.status === "completed" ? (
-            <p>This interview is complete. Reports will be available later.</p>
-          ) : null}
-        </CardContent>
+            <StartInterviewButton sessionId={interview.id} />
+          </CardContent>
+        ) : null}
       </Card>
 
-      {interview.status === "pending" ? (
-        <StartInterviewButton sessionId={interview.id} />
-      ) : null}
+      {showWorkspace ? <InterviewWorkspace sessionId={interview.id} /> : null}
 
       <div className="mt-8">
         <ButtonLink href="/dashboard" variant="ghost" size="sm">
