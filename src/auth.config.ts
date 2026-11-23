@@ -11,7 +11,13 @@ export const authConfig = {
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
-      if (nextUrl.pathname.startsWith("/dashboard")) {
+      const path = nextUrl.pathname;
+      const isProtected =
+        path.startsWith("/dashboard") ||
+        path.startsWith("/interviews") ||
+        path.startsWith("/interview/");
+
+      if (isProtected) {
         return !!auth?.user;
       }
       return true;

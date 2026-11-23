@@ -15,6 +15,9 @@ export function SiteHeaderActions({ userName }: SiteHeaderActionsProps) {
     <ButtonLink href="/dashboard" variant="ghost" size="sm">
       Dashboard
     </ButtonLink>
+    <ButtonLink href="/interviews" variant="ghost" size="sm">
+      History
+    </ButtonLink>
     <form action={signOutAction}>
       <Button type="submit" variant="outline" size="sm">
         Sign out
