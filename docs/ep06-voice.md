@@ -71,4 +71,4 @@ git commit -m "feat(ep06): voice mode with AssemblyAI and speech synthesis"
 
 ## Next episode
 
-**ep07-deploy** — Vercel, env vars, polish.
+**ep07-testing** — Jest unit tests for core lib. Then deploy (ep08).

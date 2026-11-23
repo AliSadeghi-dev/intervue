@@ -1,6 +1,6 @@
 "use client";
 
-import type { QuestionToken } from "@/hooks/use-question-speech";
+import type { QuestionToken } from "@/lib/speech/question-text";
 import { cn } from "cn";
 
 type HighlightedQuestionTextProps = {

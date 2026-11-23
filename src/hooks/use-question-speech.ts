@@ -3,50 +3,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  findWordIndexAtChar,
+  tokenizeQuestion,
+  type QuestionToken,
+} from "@/lib/speech/question-text";
+import {
   isSpeechSynthesisSupported,
   pickEnglishVoice,
   stopSpeech,
 } from "@/lib/speech/speech-synthesis";
 
-export type QuestionToken = {
-  text: string;
-  start: number;
-  isWord: boolean;
-  wordIndex: number;
-};
-
-export function tokenizeQuestion(text: string): QuestionToken[] {
-  const tokens: QuestionToken[] = [];
-  const pattern = /\S+|\s+/g;
-  let match: RegExpExecArray | null;
-  let wordIndex = 0;
-
-  while ((match = pattern.exec(text)) !== null) {
-    const chunk = match[0];
-    const isWord = /\S/.test(chunk);
-    tokens.push({
-      text: chunk,
-      start: match.index,
-      isWord,
-      wordIndex: isWord ? wordIndex++ : -1,
-    });
-  }
-
-  return tokens;
-}
-
-function findWordIndex(tokens: QuestionToken[], charIndex: number): number {
-  for (let i = tokens.length - 1; i >= 0; i--) {
-    const token = tokens[i];
-    if (!token.isWord) {
-      continue;
-    }
-    if (charIndex >= token.start) {
-      return token.wordIndex;
-    }
-  }
-  return 0;
-}
+export type { QuestionToken };
+export { tokenizeQuestion };
 
 type UseQuestionSpeechOptions = {
   text: string | null;
@@ -135,7 +103,7 @@ export function useQuestionSpeech({ text, autoRead = true }: UseQuestionSpeechOp
         if (event.name !== "word") {
           return;
         }
-        const idx = Math.min(words - 1, findWordIndex(speechTokens, event.charIndex));
+        const idx = Math.min(words - 1, findWordIndexAtChar(speechTokens, event.charIndex));
         anchorBoundaryRef.current = idx;
         setHighlightIndex(idx, words);
       };
